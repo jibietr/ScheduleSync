@@ -49,7 +49,9 @@ const Dashboard: React.FC = () => {
     queryFn: async () => {
       const response = await fetch(`/api/calendar-events?userId=1`);
       if (!response.ok) throw new Error("Failed to fetch calendar events");
-      return response.json();
+      const events = await response.json();
+      console.log("Calendar events:", events);
+      return events;
     }
   });
 
