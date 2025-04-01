@@ -269,10 +269,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(400).json({ message: "User ID is required" });
     }
     
-    // Get all calendar events for the next 14 days
+    // Get all calendar events for the next 30 days
     const startDate = new Date();
     const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + 14);
+    endDate.setDate(endDate.getDate() + 30);
     
     const events = await storage.getCalendarEvents(userId, startDate, endDate);
     
