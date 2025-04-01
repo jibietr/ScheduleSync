@@ -276,17 +276,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Calendar Events
   app.get("/api/calendar-events", async (req: Request, res: Response) => {
     const userId = Number(req.query.userId);
+    const startDate = req.query.startDate ? new Date(req.query.startDate as string) : new Date();
+    const endDate = req.query.endDate ? new Date(req.query.endDate as string) : new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+    
     console.log(`[API] Fetching calendar events for user ${userId}`);
     
     if (!userId) {
       console.log(`[API] Missing user ID in request`);
       return res.status(400).json({ message: "User ID is required" });
     }
-    
-    // Get all calendar events for the next 30 days
-    const startDate = new Date();
-    const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + 30);
     
     console.log(`[API] Fetching events between ${startDate.toISOString()} and ${endDate.toISOString()}`);
     const events = await storage.getCalendarEvents(userId, startDate, endDate);
