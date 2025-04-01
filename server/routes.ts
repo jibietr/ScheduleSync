@@ -7,6 +7,18 @@ import { z } from "zod";
 import { insertMeetingTemplateSchema, insertBookingSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Debug endpoint
+  app.get("/api/debug/storage", async (req: Request, res: Response) => {
+    // Only return non-sensitive data for debugging
+    const debug = {
+      users: Array.from(storage.users.values()),
+      meetingTemplates: Array.from(storage.meetingTemplates.values()),
+      bookings: Array.from(storage.bookings.values()),
+      calendarEvents: Array.from(storage.calendarEvents.values()),
+    };
+    res.json(debug);
+  });
+
   // API Routes
   app.get("/api/user/:id", async (req: Request, res: Response) => {
     const { id } = req.params;
@@ -283,17 +295,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(events);
   });
   
-  app.get("/api/debug/storage", async (req: Request, res: Response) => {
-    // Only return non-sensitive data for debugging
-    const debug = {
-      users: Array.from(storage.users.values()),
-      meetingTemplates: Array.from(storage.meetingTemplates.values()),
-      bookings: Array.from(storage.bookings.values()),
-      calendarEvents: Array.from(storage.calendarEvents.values()),
-    };
-    res.json(debug);
-  });
-
   app.get("/api/bookings/:id", async (req: Request, res: Response) => {
     const { id } = req.params;
     const booking = await storage.getBooking(Number(id));
