@@ -183,6 +183,7 @@ export const MeetingList: React.FC<MeetingListProps> = ({
       </TabsContent>
 
       <TabsContent value="imported" className="mt-6">
+        {console.log("Imported events in MeetingList:", importedEvents)}
         {importedEvents.length === 0 ? (
           <Card>
             <CardContent className="p-10 flex flex-col items-center justify-center text-center">

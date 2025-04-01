@@ -149,11 +149,14 @@ const Dashboard: React.FC = () => {
           <MeetingList 
             upcomingMeetings={data?.upcoming || []}
             pastMeetings={data?.past || []}
-            importedEvents={calendarEvents.map((event: CalendarEvent) => ({
-              startTime: new Date(event.startTime),
-              endTime: new Date(event.endTime),
-              summary: event.summary
-            }))}
+            importedEvents={calendarEvents.map((event: CalendarEvent) => {
+              console.log("Calendar events:", calendarEvents);
+              return {
+                startTime: new Date(event.startTime),
+                endTime: new Date(event.endTime),
+                summary: event.summary
+              };
+            })}
             onReschedule={handleReschedule}
             onCancel={handleCancelBooking}
             onViewNotes={handleViewNotes}
