@@ -11,23 +11,13 @@ export interface CalendarEvent {
 
 export async function fetchCalendarEvents(icsUrl: string): Promise<CalendarEvent[]> {
   try {
-    console.log(`[Calendar] Fetching events from URL: ${icsUrl}`);
     const events = await ical.async.fromURL(icsUrl);
-    console.log(`[Calendar] Raw events fetched:`, Object.keys(events).length);
-    
     const calendarEvents: CalendarEvent[] = [];
 
     for (const [key, event] of Object.entries(events)) {
-      if (event.type !== 'VEVENT') {
-        console.log(`[Calendar] Skipping non-VEVENT type:`, event.type);
-        continue;
-      }
-      if (!event.start || !event.end) {
-        console.log(`[Calendar] Skipping event without start/end:`, event.summary);
-        continue;
-      }
+      if (event.type !== 'VEVENT') continue;
+      if (!event.start || !event.end) continue;
 
-      console.log(`[Calendar] Processing event: ${event.summary} (${event.start} - ${event.end})`);
       calendarEvents.push({
         summary: event.summary || 'Busy',
         start: event.start,
@@ -36,7 +26,6 @@ export async function fetchCalendarEvents(icsUrl: string): Promise<CalendarEvent
       });
     }
 
-    console.log(`[Calendar] Successfully processed ${calendarEvents.length} events`);
     return calendarEvents;
   } catch (error) {
     console.error('Error fetching calendar events:', error);
@@ -50,15 +39,22 @@ export async function syncCalendarEvents(user: User): Promise<number> {
   }
 
   try {
+    console.log(`Starting calendar sync for user ${user.id}`);
+    
     // Clear existing events
-    await storage.deleteCalendarEventsByUserId(user.id);
+    const deleted = await storage.deleteCalendarEventsByUserId(user.id);
+    console.log(`Deleted ${deleted} existing calendar events`);
 
     // Fetch new events
+    console.log(`Fetching events from ${user.calendarUrl}`);
     const events = await fetchCalendarEvents(user.calendarUrl);
+    console.log(`Fetched ${events.length} events from calendar`);
+    
     let count = 0;
 
     // Save new events
     for (const event of events) {
+      console.log(`Processing event: ${event.summary} from ${event.start} to ${event.end}`);
       await storage.createCalendarEvent({
         userId: user.id,
         externalId: event.uid,

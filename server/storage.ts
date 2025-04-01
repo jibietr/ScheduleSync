@@ -245,14 +245,16 @@ export class MemStorage implements IStorage {
 
   // Calendar Event operations
   async getCalendarEvents(userId: number, startDate: Date, endDate: Date): Promise<CalendarEvent[]> {
-    console.log(`[Storage] Fetching calendar events for user ${userId} between ${startDate} and ${endDate}`);
+    console.log(`Fetching calendar events for user ${userId} between ${startDate} and ${endDate}`);
     const events = Array.from(this.calendarEvents.values()).filter(
       (event) => {
         return event.userId === userId && 
+               // Event starts before the end date and ends after the start date
+               // This captures all events that overlap with the date range
                (new Date(event.startTime) < endDate && new Date(event.endTime) > startDate);
       }
     );
-    console.log(`[Storage] Found ${events.length} events for user ${userId}`);
+    console.log(`Found ${events.length} calendar events in date range`);
     return events;
   }
 
