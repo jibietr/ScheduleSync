@@ -62,7 +62,7 @@ export class MemStorage implements IStorage {
       firstName: "Jane",
       lastName: "Smith",
       email: "jane.smith@example.com",
-      timezone: "America/New_York",
+      timezone: "Europe/Paris",
       calendarUrl: "",
       autoSync: true
     });
@@ -89,77 +89,41 @@ export class MemStorage implements IStorage {
       isDefault: true
     });
 
-    // Add some sample bookings
+    // We're not adding any sample bookings as requested
+    
+    // Add some sample calendar events from ICS import
     const now = new Date();
-    const threeDaysLater = new Date(now);
-    threeDaysLater.setDate(now.getDate() + 3);
+    const tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
     
-    const fourDaysLater = new Date(now);
-    fourDaysLater.setDate(now.getDate() + 4);
+    const dayAfterTomorrow = new Date(now);
+    dayAfterTomorrow.setDate(now.getDate() + 2);
     
-    const sixDaysLater = new Date(now);
-    sixDaysLater.setDate(now.getDate() + 6);
+    const nextWeek = new Date(now);
+    nextWeek.setDate(now.getDate() + 7);
     
-    const twoDaysAgo = new Date(now);
-    twoDaysAgo.setDate(now.getDate() - 2);
+    this.createCalendarEvent({
+      userId: 1,
+      summary: "Team Standup",
+      startTime: new Date(tomorrow.setHours(9, 0, 0, 0)),
+      endTime: new Date(tomorrow.setHours(9, 30, 0, 0)),
+      externalId: "standup-123456"
+    });
     
-    const threeDaysAgo = new Date(now);
-    threeDaysAgo.setDate(now.getDate() - 3);
-
-    // Create some sample bookings
-    this.createBooking({
-      templateId: 1,
-      inviteeName: "Alex Johnson",
-      inviteeEmail: "alex@example.com",
-      startTime: new Date(threeDaysLater.setHours(10, 0, 0, 0)),
-      endTime: new Date(threeDaysLater.setHours(10, 30, 0, 0)),
-      additionalInfo: "Initial Project Discussion",
-      status: "confirmed",
-      timezone: "America/New_York"
+    this.createCalendarEvent({
+      userId: 1,
+      summary: "Product Planning",
+      startTime: new Date(dayAfterTomorrow.setHours(14, 0, 0, 0)),
+      endTime: new Date(dayAfterTomorrow.setHours(15, 0, 0, 0)),
+      externalId: "planning-789012"
     });
-
-    this.createBooking({
-      templateId: 1,
-      inviteeName: "Sarah Chen",
-      inviteeEmail: "sarah@example.com",
-      startTime: new Date(fourDaysLater.setHours(14, 0, 0, 0)),
-      endTime: new Date(fourDaysLater.setHours(14, 30, 0, 0)),
-      additionalInfo: "Product Review",
-      status: "confirmed",
-      timezone: "America/New_York"
-    });
-
-    this.createBooking({
-      templateId: 1,
-      inviteeName: "Carlos Diaz",
-      inviteeEmail: "carlos@example.com",
-      startTime: new Date(sixDaysLater.setHours(11, 0, 0, 0)),
-      endTime: new Date(sixDaysLater.setHours(11, 30, 0, 0)),
-      additionalInfo: "Weekly Check-in",
-      status: "confirmed",
-      timezone: "America/New_York"
-    });
-
-    this.createBooking({
-      templateId: 1,
-      inviteeName: "Mike Taylor",
-      inviteeEmail: "mike@example.com",
-      startTime: new Date(twoDaysAgo.setHours(13, 0, 0, 0)),
-      endTime: new Date(twoDaysAgo.setHours(13, 30, 0, 0)),
-      additionalInfo: "Project Kickoff",
-      status: "completed",
-      timezone: "America/New_York"
-    });
-
-    this.createBooking({
-      templateId: 1,
-      inviteeName: "Janet Kim",
-      inviteeEmail: "janet@example.com",
-      startTime: new Date(threeDaysAgo.setHours(15, 0, 0, 0)),
-      endTime: new Date(threeDaysAgo.setHours(15, 30, 0, 0)),
-      additionalInfo: "Interview",
-      status: "completed",
-      timezone: "America/New_York"
+    
+    this.createCalendarEvent({
+      userId: 1,
+      summary: "Quarterly Review",
+      startTime: new Date(nextWeek.setHours(10, 0, 0, 0)),
+      endTime: new Date(nextWeek.setHours(11, 30, 0, 0)),
+      externalId: "review-345678"
     });
 
     // Additional templates

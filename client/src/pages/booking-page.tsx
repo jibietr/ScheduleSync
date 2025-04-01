@@ -18,13 +18,7 @@ const BookingPage: React.FC = () => {
   const [matched, params] = useRoute("/:username/:slug");
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedSlot, setSelectedSlot] = useState<Date>();
-  const [timezone, setTimezone] = useState<string>(() => {
-    try {
-      return Intl.DateTimeFormat().resolvedOptions().timeZone;
-    } catch (e) {
-      return "America/New_York";
-    }
-  });
+  const [timezone, setTimezone] = useState<string>("Europe/Paris");
   const { toast } = useToast();
 
   // Reset selected slot when date changes

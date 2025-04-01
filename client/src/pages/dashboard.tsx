@@ -16,6 +16,18 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Skeleton } from "@/components/ui/skeleton";
 
+// Define calendar event interface
+interface CalendarEvent {
+  id: number;
+  userId: number;
+  startTime: Date | string;
+  endTime: Date | string;
+  summary: string | null;
+  externalId: string | null;
+  createdAt: Date | null;
+  lastSynced: Date | null;
+}
+
 const Dashboard: React.FC = () => {
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [selectedBookingId, setSelectedBookingId] = useState<number | null>(null);
@@ -27,6 +39,16 @@ const Dashboard: React.FC = () => {
     queryFn: async ({ queryKey }) => {
       const response = await fetch(`/api/bookings?userId=1`);
       if (!response.ok) throw new Error("Failed to fetch bookings");
+      return response.json();
+    }
+  });
+  
+  // Fetch calendar events
+  const { data: calendarEvents = [], isLoading: calendarLoading } = useQuery<CalendarEvent[]>({
+    queryKey: ["/api/calendar-events", { userId: 1 }],
+    queryFn: async () => {
+      const response = await fetch(`/api/calendar-events?userId=1`);
+      if (!response.ok) throw new Error("Failed to fetch calendar events");
       return response.json();
     }
   });
@@ -101,7 +123,7 @@ const Dashboard: React.FC = () => {
         <p className="text-gray-600">Welcome back. Here's an overview of your scheduled meetings.</p>
       </div>
       
-      {isLoading ? (
+      {isLoading || calendarLoading ? (
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             {[...Array(3)].map((_, i) => (
@@ -121,6 +143,11 @@ const Dashboard: React.FC = () => {
           <MeetingList 
             upcomingMeetings={data?.upcoming || []}
             pastMeetings={data?.past || []}
+            importedEvents={calendarEvents.map((event: CalendarEvent) => ({
+              startTime: new Date(event.startTime),
+              endTime: new Date(event.endTime),
+              summary: event.summary
+            }))}
             onReschedule={handleReschedule}
             onCancel={handleCancelBooking}
             onViewNotes={handleViewNotes}

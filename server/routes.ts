@@ -245,6 +245,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ upcoming, past });
   });
   
+  // Calendar Events
+  app.get("/api/calendar-events", async (req: Request, res: Response) => {
+    const userId = Number(req.query.userId);
+    
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
+    
+    // Get all calendar events for the next 14 days
+    const startDate = new Date();
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 14);
+    
+    const events = await storage.getCalendarEvents(userId, startDate, endDate);
+    
+    res.json(events);
+  });
+  
   app.get("/api/bookings/:id", async (req: Request, res: Response) => {
     const { id } = req.params;
     const booking = await storage.getBooking(Number(id));
