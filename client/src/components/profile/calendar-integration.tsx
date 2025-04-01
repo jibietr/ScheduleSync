@@ -107,6 +107,15 @@ export const CalendarIntegration: React.FC<CalendarIntegrationProps> = ({
 
   const handleSubmit = (values: CalendarFormValues) => {
     onUpdate(values);
+    // If a new calendar URL is provided, show a message that events will be synced
+    if (values.calendarUrl && values.calendarUrl !== initialData.calendarUrl) {
+      toast({
+        title: "Calendar URL Updated",
+        description: "Your calendar will be synced automatically in the background.",
+      });
+      // Update last synced time
+      setLastSynced(new Date().toLocaleTimeString());
+    }
   };
 
   return (

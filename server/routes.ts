@@ -35,11 +35,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.put("/api/user/:id", async (req: Request, res: Response) => {
     const { id } = req.params;
     const userData = req.body;
+    const userId = Number(id);
     
-    const user = await storage.updateUser(Number(id), userData);
+    const oldUser = await storage.getUser(userId);
+    if (!oldUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
     
+    // Update the user
+    const user = await storage.updateUser(userId, userData);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
+    }
+    
+    // If calendar URL has changed and is not empty, trigger a sync automatically
+    if (userData.calendarUrl && userData.calendarUrl !== oldUser.calendarUrl) {
+      try {
+        await syncCalendarEvents(user);
+      } catch (error) {
+        console.error("Error syncing calendar after URL update:", error);
+        // Continue with the response even if sync fails
+      }
     }
     
     const { password, ...userWithoutPassword } = user;

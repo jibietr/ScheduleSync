@@ -63,7 +63,7 @@ export class MemStorage implements IStorage {
       lastName: "Smith",
       email: "jane.smith@example.com",
       timezone: "Europe/Paris",
-      calendarUrl: "",
+      calendarUrl: null, // No default calendar URL, will be set by the user
       autoSync: true
     });
 
@@ -91,40 +91,7 @@ export class MemStorage implements IStorage {
 
     // We're not adding any sample bookings as requested
     
-    // Add some sample calendar events from ICS import
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(now.getDate() + 1);
-    
-    const dayAfterTomorrow = new Date(now);
-    dayAfterTomorrow.setDate(now.getDate() + 2);
-    
-    const nextWeek = new Date(now);
-    nextWeek.setDate(now.getDate() + 7);
-    
-    this.createCalendarEvent({
-      userId: 1,
-      summary: "Team Standup",
-      startTime: new Date(tomorrow.setHours(9, 0, 0, 0)),
-      endTime: new Date(tomorrow.setHours(9, 30, 0, 0)),
-      externalId: "standup-123456"
-    });
-    
-    this.createCalendarEvent({
-      userId: 1,
-      summary: "Product Planning",
-      startTime: new Date(dayAfterTomorrow.setHours(14, 0, 0, 0)),
-      endTime: new Date(dayAfterTomorrow.setHours(15, 0, 0, 0)),
-      externalId: "planning-789012"
-    });
-    
-    this.createCalendarEvent({
-      userId: 1,
-      summary: "Quarterly Review",
-      startTime: new Date(nextWeek.setHours(10, 0, 0, 0)),
-      endTime: new Date(nextWeek.setHours(11, 30, 0, 0)),
-      externalId: "review-345678"
-    });
+    // We're not adding any sample calendar events either as they should come from the user's actual calendar
 
     // Additional templates
     this.createMeetingTemplate({
