@@ -264,8 +264,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Calendar Events
   app.get("/api/calendar-events", async (req: Request, res: Response) => {
     const userId = Number(req.query.userId);
+    console.log(`[API] Fetching calendar events for user ${userId}`);
     
     if (!userId) {
+      console.log(`[API] Missing user ID in request`);
       return res.status(400).json({ message: "User ID is required" });
     }
     
@@ -274,7 +276,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const endDate = new Date(startDate);
     endDate.setDate(endDate.getDate() + 30);
     
+    console.log(`[API] Fetching events between ${startDate.toISOString()} and ${endDate.toISOString()}`);
     const events = await storage.getCalendarEvents(userId, startDate, endDate);
+    console.log(`[API] Returning ${events.length} events to client`);
     
     res.json(events);
   });

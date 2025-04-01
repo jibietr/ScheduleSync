@@ -11,7 +11,7 @@ export interface IStorage {
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
   updateUser(id: number, data: Partial<InsertUser>): Promise<User | undefined>;
-  
+
   // Meeting Template operations
   getMeetingTemplate(id: number): Promise<MeetingTemplate | undefined>;
   getMeetingTemplateBySlug(username: string, slug: string): Promise<MeetingTemplate | undefined>;
@@ -19,14 +19,14 @@ export interface IStorage {
   createMeetingTemplate(template: InsertMeetingTemplate): Promise<MeetingTemplate>;
   updateMeetingTemplate(id: number, data: Partial<InsertMeetingTemplate>): Promise<MeetingTemplate | undefined>;
   deleteMeetingTemplate(id: number): Promise<boolean>;
-  
+
   // Booking operations
   getBooking(id: number): Promise<Booking | undefined>;
   getBookingsByTemplateId(templateId: number): Promise<Booking[]>;
   getBookingsByUserId(userId: number): Promise<Booking[]>;
   createBooking(booking: InsertBooking): Promise<Booking>;
   updateBookingStatus(id: number, status: string): Promise<Booking | undefined>;
-  
+
   // Calendar Event operations
   getCalendarEvents(userId: number, startDate: Date, endDate: Date): Promise<CalendarEvent[]>;
   createCalendarEvent(event: InsertCalendarEvent): Promise<CalendarEvent>;
@@ -90,7 +90,7 @@ export class MemStorage implements IStorage {
     });
 
     // We're not adding any sample bookings as requested
-    
+
     // We're not adding any sample calendar events either as they should come from the user's actual calendar
 
     // Additional templates
@@ -159,7 +159,7 @@ export class MemStorage implements IStorage {
   async updateUser(id: number, data: Partial<InsertUser>): Promise<User | undefined> {
     const user = this.users.get(id);
     if (!user) return undefined;
-    
+
     const updatedUser = { ...user, ...data };
     this.users.set(id, updatedUser);
     return updatedUser;
@@ -173,7 +173,7 @@ export class MemStorage implements IStorage {
   async getMeetingTemplateBySlug(username: string, slug: string): Promise<MeetingTemplate | undefined> {
     const user = await this.getUserByUsername(username);
     if (!user) return undefined;
-    
+
     return Array.from(this.meetingTemplates.values()).find(
       (template) => template.userId === user.id && template.slug === slug,
     );
@@ -196,7 +196,7 @@ export class MemStorage implements IStorage {
   async updateMeetingTemplate(id: number, data: Partial<InsertMeetingTemplate>): Promise<MeetingTemplate | undefined> {
     const template = this.meetingTemplates.get(id);
     if (!template) return undefined;
-    
+
     const updatedTemplate = { ...template, ...data };
     this.meetingTemplates.set(id, updatedTemplate);
     return updatedTemplate;
@@ -220,7 +220,7 @@ export class MemStorage implements IStorage {
   async getBookingsByUserId(userId: number): Promise<Booking[]> {
     const templates = await this.getMeetingTemplatesByUserId(userId);
     const templateIds = templates.map(t => t.id);
-    
+
     return Array.from(this.bookings.values()).filter(
       (booking) => templateIds.includes(booking.templateId),
     );
@@ -237,7 +237,7 @@ export class MemStorage implements IStorage {
   async updateBookingStatus(id: number, status: string): Promise<Booking | undefined> {
     const booking = this.bookings.get(id);
     if (!booking) return undefined;
-    
+
     const updatedBooking = { ...booking, status };
     this.bookings.set(id, updatedBooking);
     return updatedBooking;
@@ -245,14 +245,15 @@ export class MemStorage implements IStorage {
 
   // Calendar Event operations
   async getCalendarEvents(userId: number, startDate: Date, endDate: Date): Promise<CalendarEvent[]> {
-    return Array.from(this.calendarEvents.values()).filter(
+    console.log(`[Storage] Fetching calendar events for user ${userId} between ${startDate} and ${endDate}`);
+    const events = Array.from(this.calendarEvents.values()).filter(
       (event) => {
         return event.userId === userId && 
-               // Event starts before the end date and ends after the start date
-               // This captures all events that overlap with the date range
                (new Date(event.startTime) < endDate && new Date(event.endTime) > startDate);
       }
     );
+    console.log(`[Storage] Found ${events.length} events for user ${userId}`);
+    return events;
   }
 
   async createCalendarEvent(event: InsertCalendarEvent): Promise<CalendarEvent> {
@@ -260,10 +261,12 @@ export class MemStorage implements IStorage {
     const now = new Date();
     const newEvent: CalendarEvent = { ...event, id, createdAt: now, lastSynced: now };
     this.calendarEvents.set(id, newEvent);
+    console.log(`[Storage] Created calendar event: ${newEvent.summary} (ID: ${id})`);
     return newEvent;
   }
 
   async deleteCalendarEventsByUserId(userId: number): Promise<number> {
+    console.log(`[Storage] Deleting calendar events for user ${userId}`);
     let count = 0;
     for (const [id, event] of this.calendarEvents.entries()) {
       if (event.userId === userId) {
@@ -271,6 +274,7 @@ export class MemStorage implements IStorage {
         count++;
       }
     }
+    console.log(`[Storage] Deleted ${count} events for user ${userId}`);
     return count;
   }
 
@@ -278,7 +282,7 @@ export class MemStorage implements IStorage {
   async getUpcomingBookings(userId: number): Promise<Booking[]> {
     const allBookings = await this.getBookingsByUserId(userId);
     const now = new Date();
-    
+
     return allBookings.filter(booking => 
       booking.startTime > now && booking.status === "confirmed"
     ).sort((a, b) => a.startTime.getTime() - b.startTime.getTime());
@@ -287,7 +291,7 @@ export class MemStorage implements IStorage {
   async getPastBookings(userId: number): Promise<Booking[]> {
     const allBookings = await this.getBookingsByUserId(userId);
     const now = new Date();
-    
+
     return allBookings.filter(booking => 
       booking.startTime <= now || booking.status === "completed"
     ).sort((a, b) => b.startTime.getTime() - a.startTime.getTime());
