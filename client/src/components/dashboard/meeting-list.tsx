@@ -206,9 +206,12 @@ export const MeetingList: React.FC<MeetingListProps> = ({
                         </div>
                         <div className="ml-4">
                           <p className="font-medium text-gray-900">{event.summary || 'Calendar Event'}</p>
+                          <p className="text-sm text-gray-500">
+                            {formatShortDate(new Date(event.startTime))} • {formatTimeRange(new Date(event.startTime), new Date(event.endTime))}
+                          </p>
                         </div>
                       </div>
-                      <div className="ml-2 flex-shrink-0 flex">
+                      <div className="ml-2 flex-shrink-0">
                         <p className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
                           Imported
                         </p>
