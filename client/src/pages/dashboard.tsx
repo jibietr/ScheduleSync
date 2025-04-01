@@ -150,7 +150,13 @@ const Dashboard: React.FC = () => {
             upcomingMeetings={data?.upcoming || []}
             pastMeetings={data?.past || []}
             importedEvents={calendarEvents.map((event: CalendarEvent) => {
-              console.log("Calendar events:", calendarEvents);
+              console.log("Processing calendar event:", {
+                id: event.id,
+                summary: event.summary,
+                startTime: event.startTime,
+                endTime: event.endTime,
+                rawEvent: event
+              });
               return {
                 startTime: new Date(event.startTime),
                 endTime: new Date(event.endTime),
