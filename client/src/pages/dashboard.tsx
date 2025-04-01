@@ -47,7 +47,11 @@ const Dashboard: React.FC = () => {
   const { data: calendarEvents = [], isLoading: calendarLoading } = useQuery<CalendarEvent[]>({
     queryKey: ["/api/calendar-events", { userId: 1 }],
     queryFn: async () => {
-      const response = await fetch(`/api/calendar-events?userId=1`);
+      const now = new Date();
+      const sixMonthsFromNow = new Date();
+      sixMonthsFromNow.setMonth(now.getMonth() + 6);
+      
+      const response = await fetch(`/api/calendar-events?userId=1&startDate=${now.toISOString()}&endDate=${sixMonthsFromNow.toISOString()}`);
       if (!response.ok) throw new Error("Failed to fetch calendar events");
       const events = await response.json();
       console.log("Calendar events:", events);
